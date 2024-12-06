@@ -1,29 +1,27 @@
-%% Exercise 2.6
 clc, clearvars, close all;
-n_x = 100;
-n_y = 10000;
+
+n = 100;
+N = 10000;
 a = 0;
 b = 1;
+Y = zeros(1, N);
+mu_Y_theoretical = (a + b) / 2;
+std_Y_theoretical = sqrt((b - a)^2 / 12 / n);
 
-Y = zeros(1, n_y);
-for i = 1:n_y
-    X = a + (b - a) * rand(1, n_x);
+for i = 1:N
+    X = rand(1, n);
     Y(i) = mean(X);
 end
 
-% Plot simulation data
 figure;
-histogram(Y, 'Normalization', 'pdf');
+nbins = 30;
+histogram(Y, nbins, 'Normalization', 'pdf', 'DisplayName', 'Simulation');
 hold on;
-
-% Calculate theoretical cdf according to Central Limit Theorem (CLT)
-mu = (a + b) / 2; % theoretical mean
-sigma = sqrt((b - a)^2 / 12 / n_x); % theoretical standard deviation
-x_values = linspace(min(Y), max(Y), 1000);
-y_values = exp(-(x_values - mu).^2 / (2 * sigma^2)) / (sqrt(2 * pi) * sigma);
-
-plot(x_values, y_values, 'r-', 'LineWidth', 2);
-title('Exercise 2.6');
-xlabel('Mean (Y)');
-ylabel('Probability Density');
-legend('Histogram of mean (Y)', 'Theoretical Normal Distribution');
+yvalues = linspace(min(Y), max(Y), 100);
+probs = normpdf(yvalues, mu_Y_theoretical, std_Y_theoretical);
+plot(yvalues, probs, '-r', 'LineWidth', 2, 'DisplayName', 'Theoretical pdf');
+hold off;
+xlabel('Y');
+ylabel('Probability');
+title(sprintf('Central Limit Theorem (n=%d)', n));
+legend show;

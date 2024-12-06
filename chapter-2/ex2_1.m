@@ -1,20 +1,18 @@
-%% Exercise 2.1
 clc, clearvars, close all;
 
-tol = 1e-3;
-iters = 7;
-n_values = zeros(1, iters);
-probs = zeros(1, iters);
-
-for i = 1:iters
+N = 8;
+probs = zeros(1, N);
+nvalues = zeros(1, N);
+for i = 0:N
     n = 10^i;
-    n_values(i) = n;
-    probs(i) = sum(randi(2, 1, n) == 1) / n; % 1 denotes tails, 2 denotes heads
+    nvalues(i + 1) = n;
+    probs(i + 1) = sum(randi(2, 1, n) - 1) / n;
 end
 
 figure;
-plot(n_values, probs, '*');
-set(gca, 'XScale', 'log');  % Set x-axis to logarithmic scale
-xlabel('Number of coin flips');
-ylabel('Probability of getting tails');
-title('Exercise 2.1');
+plot(nvalues, probs, '-go', 'LineWidth', 2);
+hold on;
+plot(nvalues, 0.5 * ones(1, N + 1), '--r', 'LineWidth', 2);
+set(gca, 'XScale', 'log'); % Set the x-axis to a logarithmic scale
+xlabel('Coin tosses');
+ylabel('Tails probability');

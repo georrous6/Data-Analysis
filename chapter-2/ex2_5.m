@@ -1,19 +1,19 @@
-%% Exercise 2.5
 clc, clearvars, close all;
 
-n = 100000;
-mu = 4.;
-sigma = sqrt(0.01);
-X = mu + sigma * randn(1, n);
+n = 10000000;
+mu = 4;
+std = 0.1;
+X = mu + std * randn(1, n);
 
-% Rejection probability
-prob = sum(X < 3.9) / n;
-theoretical_prob = normcdf(3.9, mu, sigma);
-fprintf("Pr(X < 3.9) = %f\n", prob);
-fprintf("Pr(X < 3.9) = %f (theoretical)\n", theoretical_prob);
+threshold = 3.9;
+prob_rejected_theoretical = normcdf(threshold, mu, std);
+prob_rejected_simulation = sum(X < threshold) / length(X);
+fprintf('Pr(X < %.4f) = %.6f (theoretical)\n', threshold, prob_rejected_theoretical);
+fprintf('Pr(X < %.4f) = %.6f (simulation)\n', threshold, prob_rejected_simulation);
 
-% Upper bound calculation
-bound = norminv(0.01, mu, sigma);
-fprintf("bound = %f\n", bound);
-
-histogram(X, 'Normalization', 'pdf');
+prob_rejected_theoretical = 0.01;
+threshold = norminv(prob_rejected_theoretical, 4, 0.1);
+% Alternatively: threshold = mu + std * norminv(prob_rejected_theoretical, 0, 1);
+prob_rejected_simulation = sum(X < threshold) / length(X);
+fprintf('Pr(X < %.4f) = %.6f (theoretical)\n', threshold, prob_rejected_theoretical);
+fprintf('Pr(X < %.4f) = %.6f (simulation)\n', threshold, prob_rejected_simulation);

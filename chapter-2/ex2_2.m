@@ -1,24 +1,19 @@
-%% Exercise 2.2
 clc, clearvars, close all;
 
-N = 1000000;
-num_of_bins = 100;
-lamda = 1;
-x = -log(1 - rand(1, N)) / lamda;
-[bin_counts, bin_edges] = histcounts(x, num_of_bins);
-probs = bin_counts / N; % calculate the probabilities
-diffs = diff(bin_edges);
-centers = bin_edges(1:end - 1) + diffs / 2.0;
-probs = probs / diffs(1); % normalize probabilities to get pdf
+n = 10000;
+lambda = 1;
+exp_cdf_inv = @(x) (-log(1 - x) / lambda);
+exp_pdf = @(x) (lambda * exp(-lambda * x));
+X = rand(1, n);
+Y = exp_cdf_inv(X);
 
-% alternatively: histogram(X, 'Normalization', 'pdf');
-
-figure;
-bar(centers, probs, 'BarWidth', 1);
-x_values = linspace(0, 10, num_of_bins);
-y_values = lamda * exp(-lamda * x_values);
+nbins = 30;
+histogram(Y, nbins, 'Normalization', 'pdf', 'DisplayName', 'Simulation Data');
 hold on;
-plot(x_values, y_values, '-r', 'LineWidth', 2);
-xlabel('Data');
+xvalues = linspace(min(Y), max(Y), 100);
+yvalues = exp_pdf(xvalues);
+plot(xvalues, yvalues, '-r', 'LineWidth', 2, 'DisplayName', 'Exponential pdf');
+hold off;
+xlabel('value');
 ylabel('Probability');
-title('Exercise 2.2');
+legend show;

@@ -1,70 +1,41 @@
-%% Exercise 2.4
 clc, clearvars, close all;
 
-min_n = 10;
-max_n = 10000;
-step_n = 10;
-N = min_n:step_n:max_n;
-n = length(N);
-m_x = zeros(1, n);
-m_inv_x = zeros(1, n);
+intervals = [1, 2; 0, 1; -1, 1];
+nvalues = round(logspace(1, 8, 8));
+mean_values = zeros(2, length(nvalues));
 
-% Uniform [1, 2]
-a = 1;
-b = 2;
-for i = 1:n
-    [m_x(i), m_inv_x(i)] = ex2_4_function(a, b, N(i));
-end
+figure;
+for i = 1:size(intervals, 1)
+    a = intervals(i, 1);
+    b = intervals(i, 2);
+    theoretical_inv_mean_X = 2 / (b + a);
+    theoretical_mean_inv_X = log(b / a) / (b - a);
+    for j = 1:length(nvalues)
+        n = nvalues(j);
+        X = (b - a) * rand(1, n) + a;
+        simulation_inv_mean_X = 1 / mean(X);
+        simulation_mean_inv_X = mean(X.^-1);
+        mean_values(1, j) = simulation_inv_mean_X;
+        mean_values(2, j) = simulation_mean_inv_X;
+    end
 
-subplot(3, 1, 1);
-plot(N, m_x);
-hold on;
-plot(N, m_inv_x);
-hold on;
-theoretical_m_inv_x = log(abs(b / a)) / (b - a); % E[1 / X]
-plot([min_n, max_n], [theoretical_m_inv_x, theoretical_m_inv_x], 'r--', 'LineWidth', 2);
-hold on;
-theoretical_m_x = 2 / (b + a); % 1 / E[X]
-plot([min_n, max_n], [theoretical_m_x, theoretical_m_x], 'k--', 'LineWidth', 2);
-title(sprintf('Uniform [%d, %d]', a, b));
-legend('1/E[X]', 'E[1/X]', 'theoretical E[1/X]', 'theoretical 1/E[X]');
+    subplot(size(intervals, 1), 1, i);
+    plot(nvalues, mean_values(1,:), '-ob', 'LineWidth', 2, 'DisplayName', '1/E[X]');
+    hold on;
+    if ~isnan(theoretical_inv_mean_X)
+        plot(nvalues, ones(1, length(nvalues)) * theoretical_inv_mean_X, '--r', ...
+            'LineWidth', 2, 'DisplayName', 'theoretical 1/E[X]');
+    end
 
-% Uniform [0, 1]
-a = 0;
-b = 1;
-for i = 1:n
-    [m_x(i), m_inv_x(i)] = ex2_4_function(a, b, N(i));
-end
-
-subplot(3, 1, 2);
-plot(N, m_x);
-hold on;
-plot(N, m_inv_x);
-hold on;
-theoretical_m_x = 2 / (b + a); % 1 / E[X]
-plot([min_n, max_n], [theoretical_m_x, theoretical_m_x], 'r--', 'LineWidth', 2);
-title(sprintf('Uniform [%d, %d]', a, b));
-legend('1/E[X]', 'E[1/X]', 'theoretical 1/E[X]');
-
-% Uniform [-1, 1]
-a = -1;
-b = 1;
-for i = 1:n
-    [m_x(i), m_inv_x(i)] = ex2_4_function(a, b, N(i));
-end
-
-subplot(3, 1, 3);
-plot(N, m_x);
-hold on;
-plot(N, m_inv_x);
-hold on;
-theoretical_m_inv_x = log(abs(b / a)) / (b - a); % E[1 / X]
-plot([min_n, max_n], [theoretical_m_inv_x, theoretical_m_inv_x], 'r--', 'LineWidth', 2);
-title(sprintf('Uniform [%d, %d]', a, b));
-legend('1/E[X]', 'E[1/X]', 'theoretical E[1/X]');
-
-function [m_x, m_inv_x] = ex2_4_function(a, b, n)
-    X = a + rand(1, n) * (b - a);
-    m_x = 1 / mean(X);
-    m_inv_x = mean(X.^-1);
+    plot(nvalues, mean_values(2,:), '-og', 'LineWidth', 2, 'DisplayName', 'E[1/X]');
+    if ~isnan(theoretical_mean_inv_X) && isreal(theoretical_mean_inv_X)
+        plot(nvalues, ones(1, length(nvalues)) * theoretical_mean_inv_X, '--m', ...
+            'LineWidth', 2, 'DisplayName', 'theoretical E[1/X]');
+    end
+    set(gca, 'XScale', 'log');
+    xlabel('n');
+    ylabel('Mean');
+    title(sprintf('Interval [%d, %d]', a, b));
+    legend show;
+    hold off;
 end
