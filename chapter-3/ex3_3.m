@@ -1,39 +1,39 @@
-%% Exercise 3.3
 clc, clearvars, close all;
-lambda = 1 / 15;
-true_mean = 1 / lambda;
+mu = 15;
 
-% compute parametric interval
-n = 1000; % size of sample
-X = exprnd(true_mean, 1, n);
-[~, ~, CI] = ttest(X, true_mean);
+M = 1000;  % Number of samples
+n_values = [5, 100];  % Sample sizes
+alpha = 0.05;
+CI = zeros(M, 2);
+H = zeros(M, 1);
 
-fprintf("Confidence interval: [%f, %f]\n", CI(1, 1), CI(1, 2));
+for n = n_values
+    cnt = 0;
+    for i = 1:M
+        X = exprnd(mu, 1, n);
+        [H(i), ~, CI(i,:)] = ttest(X, mu, alpha);
+    end
+    fprintf('n=%d, alpha=%.2f: rejection probability=%.4f\n', n, alpha, sum(H) / M);
 
-% (a)
-M = 1000; % number of samples
-n = 5; % size of each sample
-X = zeros(n, M); % preallocate memory
+    figure;
+    histogram(CI(:,1), 'Normalization', 'pdf');
+    hold on;
+    ax = axis;
+    plot([mu, mu], [ax(3), ax(4)], '-r', 'LineWidth', 2, 'DisplayName', 'mu');
+    title(sprintf('CI-lower Distribution: M=%d, n=%d, aplha=%.2f, Pr(mu<lower)=%.6f', ...
+        M, n, alpha, sum(CI(:,1) > mu) / M));
+    xlabel('CI-lower');
+    ylabel('Probability Density');
+    hold off;
 
-% Initialize matrix X
-for i = 1:M
-    X(:,i) = exprnd(true_mean, 1, n);
+    figure;
+    histogram(CI(:,2), 'Normalization', 'pdf');
+    hold on;
+    ax = axis;
+    plot([mu, mu], [ax(3), ax(4)], '-r', 'LineWidth', 2, 'DisplayName', 'mu');
+    title(sprintf('CI-upper Distribution: M=%d, n=%d, aplha=%.2f, Pr(mu>upper)=%.6f', ...
+        M, n, alpha, sum(CI(:,2) < mu) / M));
+    xlabel('CI-upper');
+    ylabel('Probability Density');
+    hold off;
 end
-
-H = ttest(X, true_mean);
-proportion = (M - sum(H)) / M;
-fprintf("H0 acceptance rate (n=%d): %f\n", n, proportion);
-
-% (b)
-M = 1000; % number of samples
-n = 100; % size of each sample
-X = zeros(n, M); % preallocate memory
-
-% Initialize matrix X
-for i = 1:M
-    X(:,i) = exprnd(true_mean, 1, n);
-end
-
-H = ttest(X, 1 / lambda);
-proportion = (M - sum(H)) / M;
-fprintf("H0 acceptance rate (n=%d): %f\n", n, proportion);

@@ -1,26 +1,44 @@
-%% Exercise 3.4
 clc, clearvars, close all;
 data = load('ex3_4_input.txt');
 X = data(:)';
-V = var(X);
+alpha = 0.05;
 
-% a) 95% confidence interval for variance
-[~, ~, CI] = vartest(X, V);
-fprintf("a)95%% Confidence interval for standard deviation: [%f, %f]\n", sqrt(CI(1, 1)), sqrt(CI(1, 2)));
+% First plot the data
+figure;
+histfit(X);
+title('Input Data for Exercise 3.4');
+xlabel('Breakdown Voltage');
+ylabel('Frequency');
 
-% b) H0: variance is 5^2
-[H, ~, ~] = vartest(X, 5^2);
-fprintf("b) Reject H0 (1 for rejection, 0 for acceptance): %d\n", H);
+figure;
+boxplot(X);
+title(sprintf('Boxplot of data for Exercise 3.4 (n=%d)', length(X)));
 
-% c) confidence interval for mean
-mu = mean(X);
-[~, ~, CI] = ttest(X);
-fprintf("c)95%% Confidence interval for mean: [%f, %f]\n", CI(1, 1), CI(1, 2));
+% Question (a), (b)
+V = 25;
+[H, P, CI] = vartest(X, V, 'Alpha', alpha);
+fprintf('(a),(b) H=%d, P=%.4f, CI=[%.4f, %4f], STD=%d: ', H, P, sqrt(CI(1)), sqrt(CI(2)), sqrt(V));
+if H == 1
+    fprintf('Reject null hypothesis\n');
+else
+    fprintf('Cannot reject null hypothesis\n');
+end
 
-% d) H0: mean is 52
-[H, ~, ~] = ttest(X, 52);
-fprintf("d) Reject H0 (1 for rejection, 0 for acceptance): %d\n", H);
+% Question (c), (d)
+MU = 52;
+[H, P, CI] = ttest(X, MU, 'Alpha', alpha);
+fprintf('(c),(d) H=%d, P=%.4f, CI=[%.4f, %4f], MU=%d: ', H, P, CI(1), CI(2), MU);
+if H == 1
+    fprintf('Reject null hypothesis\n');
+else
+    fprintf('Cannot reject null hypothesis\n');
+end
 
-% e) Perform a chi-square goodness-of-fit test
-[H, P] = chi2gof(X);
-fprintf("e) Reject H0 (1 for rejection, 0 for acceptance): %d, p-value: %f\n", H, P);
+% Question (e)
+[H, P] = chi2gof(X, 'Alpha', alpha);
+fprintf('(e) H=%d, P=%.4f: ', H, P);
+if H == 1
+    fprintf('Reject null hypothesis\n');
+else
+    fprintf('Cannot reject null hypothesis\n');
+end

@@ -1,63 +1,61 @@
-%% Exercise 3.1 (a)
 clc, clearvars, close all;
+% Question (a)
 
-n = 1000; % sample size
-lambda_real = 7; % assume an actual value for lambda
-X = poissrnd(lambda_real, 1, n); % create the sample data
-sumX = sum(X);
-lambda_mle = sumX / n; % maximum likelihood estimator (MLE) for lambda
+n = 1000; % Sample size
+lambda_real = 5;
+X = poissrnd(lambda_real, 1, n);
 
-figure(1);
-histogram(X, 'Normalization', 'pdf'); % plot sample data
+lambda_mle = mean(X);
+xvalues = min(X):max(X);
+yvalues = poisspdf(xvalues, lambda_mle);
+
+figure;
+histogram(X, 'Normalization', 'pdf', 'DisplayName', sprintf('lambda=%.2f (real)', lambda_real));
 hold on;
-x_values = 0:max(X);
-poisson_mle_pdf = poisspdf(x_values, lambda_mle);
-plot(x_values, poisson_mle_pdf, 'r-', 'LineWidth', 2);
-title('Poisson Distribution with MLE');
-xlabel('Value');
+stem(xvalues, yvalues, '-r', 'LineWidth', 2, 'DisplayName', sprintf('lambda=%.2f (MLE)', lambda_mle));
+hold off;
+title('Poisson Distribution: MLE for Lambda Parameter');
+xlabel('X');
 ylabel('Probability Density');
-legend('Sample Data', 'MLE Poisson Fit');
+legend show;
 
-% plot Log-likelihood function for different lambda values
-% assume the random variables x1, x2, ..., xn of the sample are independent
-lambdas = linspace(0, 2 * lambda_mle, 1000);
+% Question (b)
+% Parameters
+M_values = [10, 100, 1000]; % Number of samples
+n_values = [10, 100, 1000]; % Sample sizes
+lambda = 3;
 
-figure(2);
-Y = -lambdas * n + sumX * log(lambdas); % function of lambda to maximize
-[max_value, max_index] = max(Y);
-plot(lambdas, Y);
-hold on;
-plot(lambdas(max_index), max_value, 'xr');
-title('Log-likelihood function for Poisson distribution');
-xlabel('$\lambda$', 'Interpreter', 'latex');
-ylabel('ln(L($\lambda$))', 'Interpreter', 'latex');
+% Display table header
+fprintf('%-10s %-10s %-10s %-20s\n', 'M', 'n', 'lambda', 'Mean of Sample Means');
+fprintf('%s\n', repmat('-', 1, 55)); % Separator line
 
-
-%% Exercise 3.1 (b)
-clc, clearvars, close all;
-M = 1000;
-n = 100;
-lambda = 5;
-mu = poisson_samples(M, n, lambda);
-fprintf("Mean of sample means: %f\n", mu);
-
-
-function mu = poisson_samples(M, n, lambda)
-    sample_means = zeros(1, M);
-    for i = 1:M
-        X = poissrnd(lambda, 1, n);
-        sample_means(i) = mean(X);
+for M = M_values
+    for n = n_values
+        mean_of_sample_means = poisson_samples(M, n, lambda);
+        fprintf('%10d %10d %10.2f %20.4f\n', M, n, lambda, mean_of_sample_means);
+        pause;
+        close all;
     end
+end
 
+
+function mean_of_sample_means = poisson_samples(M, n, lambda)
+    samples = poissrnd(lambda, n, M);
+    sample_means = mean(samples);
+    mean_of_sample_means = mean(sample_means);
+    
     figure;
-    histogram(sample_means, 'Normalization', 'pdf'); % plot sample data
+    histogram(sample_means, 'Normalization', 'pdf', 'DisplayName', 'sample means data');
     hold on;
-    x_values = linspace(min(sample_means), max(sample_means), 1000);
-    mu = mean(sample_means);
-    theoretical_pdf = normpdf(x_values, mu, sqrt(mu / n));
-    plot(x_values, theoretical_pdf, 'r-', 'LineWidth', 2);
-    title('Distribution of Sample Means from Poisson Distribution');
+    plot([lambda, lambda], [0, max(ylim) / 2], '-y', 'LineWidth', 2, 'DisplayName', 'lambda');
+    plot([mean_of_sample_means, mean_of_sample_means], [0, max(ylim) / 2], '-g', ...
+        'LineWidth', 2, 'DisplayName', 'mean of sample means');
+    xvalues = linspace(min(sample_means), max(sample_means), 100);
+    yvalues = normpdf(xvalues, mean_of_sample_means, std(sample_means));
+    plot(xvalues, yvalues, '-r', 'LineWidth', 2, 'DisplayName', 'Normal Distribution Fit');
+    hold off;
+    title(sprintf('Distribution of Sample Means (M=%d, n=%d, lambda=%d)', M, n, lambda));
     xlabel('Sample Means');
     ylabel('Probability Density');
-    legend('Histogram of Sample Means', 'Theoretical Normal Distribution');
+    legend show;
 end

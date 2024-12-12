@@ -1,64 +1,62 @@
-%% Exercise 3.2 (a)
 clc, clearvars, close all;
+% Question (a)
 
-n = 1000; % sample size
-lambda_real = 3; % assume an actual value for lambda
-X = exprnd(1 / lambda_real, 1, n); % create the sample data
-sumX = sum(X);
-lambda_mle = n / sumX; % maximum likelihood estimator (MLE) for lambda
+n = 1000; % Sample size
+mu_real = 5;
+X = exprnd(mu_real, 1, n);
 
-figure(1);
-histogram(X, 'Normalization', 'pdf'); % plot sample data
+mu_mle = mean(X);
+xvalues = min(X):max(X);
+yvalues = exppdf(xvalues, mu_mle);
+
+figure;
+histogram(X, 'Normalization', 'pdf', 'DisplayName', sprintf('mu=%.2f (real)', mu_real));
 hold on;
-x_values = linspace(0, max(X), 1000);
-exp_mle_pdf = exppdf(x_values, 1 / lambda_mle);
-plot(x_values, exp_mle_pdf, 'r-', 'LineWidth', 2);
-title('Exponential Distribution with MLE');
-xlabel('Value');
+plot(xvalues, yvalues, '-r', 'LineWidth', 2, 'DisplayName', sprintf('mu=%.2f (MLE)', mu_mle));
+hold off;
+title('Exponential Distribution: MLE for Mean Parameter');
+xlabel('X');
 ylabel('Probability Density');
-legend('Sample Data', 'MLE Exponential Fit');
+legend show;
 
+% Question (b)
+% Parameters
+M_values = [10, 100, 1000]; % Number of samples
+n_values = [10, 100, 1000]; % Sample sizes
+mu = 3;
 
-% plot Log-likelihood function for different lambda values
-% assume the random variables x1, x2, ..., xn of the sample are independent
-lambdas = linspace(0, 2 * lambda_mle, 1000);
+% Display table header
+fprintf('%-10s %-10s %-10s %-20s\n', 'M', 'n', 'mu', 'Mean of Sample Means');
+fprintf('%s\n', repmat('-', 1, 55)); % Separator line
 
-figure(2);
-Y = n * log(lambdas) - sumX * lambdas; % function of lambda to maximize
-[max_value, max_index] = max(Y);
-plot(lambdas, Y);
-hold on;
-plot(lambdas(max_index), max_value, 'xr');
-title('Log-likelihood function for Exponential Distribution');
-xlabel('$\lambda$', 'Interpreter', 'latex');
-ylabel('ln(L($\lambda$))', 'Interpreter', 'latex');
-
-
-%% Exercise 3.2 (b)
-clc, clearvars, close all;
-M = 1000;
-n = 100;
-lambda = 5;
-mu = exponential_samples(M, n, lambda);
-fprintf("Mean of sample means: %f\n", mu);
-
-
-function mu = exponential_samples(M, n, lambda)
-    sample_means = zeros(1, M);
-    for i = 1:M
-        X = exprnd(1 / lambda, 1, n);
-        sample_means(i) = mean(X);
+for M = M_values
+    for n = n_values
+        mean_of_sample_means = exp_samples(M, n, mu);
+        fprintf('%10d %10d %10.2f %20.4f\n', M, n, mu, mean_of_sample_means);
+        pause;
+        close all;
     end
+end
 
+
+function mean_of_sample_means = exp_samples(M, n, mu)
+    samples = exprnd(mu, n, M);
+    sample_means = mean(samples);
+    mean_of_sample_means = mean(sample_means);
+    
     figure;
-    histogram(sample_means, 'Normalization', 'pdf'); % plot sample data
+    histogram(sample_means, 'Normalization', 'pdf', 'DisplayName', 'sample means data');
     hold on;
-    x_values = linspace(min(sample_means), max(sample_means), 1000);
-    mu = mean(sample_means);
-    theoretical_pdf = normpdf(x_values, mu, sqrt(mu^2 / n));
-    plot(x_values, theoretical_pdf, 'r-', 'LineWidth', 2);
-    title('Distribution of Sample Means from Exponential Distribution');
+    ax = axis;
+    plot([mu, mu], [ax(3), ax(4)], '-y', 'LineWidth', 2, 'DisplayName', 'mu');
+    plot([mean_of_sample_means, mean_of_sample_means], [ax(3), ax(4)], '-g', ...
+        'LineWidth', 2, 'DisplayName', 'mean of sample means');
+    xvalues = linspace(min(sample_means), max(sample_means), 100);
+    yvalues = normpdf(xvalues, mean_of_sample_means, std(sample_means));
+    plot(xvalues, yvalues, '-r', 'LineWidth', 2, 'DisplayName', 'Normal Distribution Fit');
+    hold off;
+    title(sprintf('Distribution of Sample Means (M=%d, n=%d, mu=%d)', M, n, mu));
     xlabel('Sample Means');
     ylabel('Probability Density');
-    legend('Histogram of Sample Means', 'Theoretical Normal Distribution');
+    legend show;
 end

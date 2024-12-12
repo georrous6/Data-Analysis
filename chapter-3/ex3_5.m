@@ -1,75 +1,98 @@
-%% Exercise 3.5
 clc, clearvars, close all;
 data = load('eruption.dat');
+alpha = 0.05;
 
-% Simply create a histogram for each column-data
-xlabels = ["Waiting time (1989)", "Duration time (1989)", "Waiting time (2006)"];
-for i = 1:3
-    figure(i);
+labels = ["Waiting Time (1989)", "Duration (1989)", "Waiting Time (2006)"];
+for i = 1:size(data, 2)
+    figure;
     histfit(data(:,i));
-    ylabel("Frequency");
-    xlabel(sprintf("%s", xlabels(i)));
+    title(labels(i));
+
+    figure;
+    boxplot(data(:,i));
+    title(labels(i));
 end
 
-waiting_1989 = data(:, 1)';
-duration_1989 = data(:, 2)';
-waiting_2006 = data(:, 3)';
+% Question (a)
+std_values = [10, 1, 10];
 
-% question a)
-[H, ~, CI] = vartest(waiting_1989, 10^2);
-fprintf("Confidence interval for standard deviation of waiting time (1989): [%f, %f]\n", sqrt(CI(1)), sqrt(CI(2)));
-fprintf("Standard deviation of waiting time (1989) is not 10\': %d\n\n", H);
+fprintf('Question (a)\n');
+for i = 1:size(data, 2)
+    std = std_values(i);
+    [H, P, CI] = vartest(data(:,i), std^2, 'Alpha', alpha);
+    fprintf('%s: H=%d, P=%.4f, CI=[%.4f, %.4f] STD=%.1f: ', labels(i), H, P, sqrt(CI(1)), sqrt(CI(2)), std);
+    if H == 1
+        fprintf('Reject null hypothesis\n');
+    else
+        fprintf('Cannot reject null hypothesis\n');
+    end
+end
 
-[H, ~, CI] = vartest(duration_1989, 1^2);
-fprintf("Confidence interval for standard deviation of duration (1989): [%f, %f]\n", sqrt(CI(1)), sqrt(CI(2)));
-fprintf("Standard deviation of duration (1989) is not 1\': %d\n\n", H);
+% Question (b)
+mu_values = [75, 2.5, 75];
 
-[H, ~, CI] = vartest(waiting_2006, 10^2);
-fprintf("Confidence interval for standard deviation of waiting time (2006): [%f, %f]\n", sqrt(CI(1)), sqrt(CI(2)));
-fprintf("Standard deviation of waiting time (2006) is not 10\': %d\n\n", H);
+fprintf('\nQuestion (b)\n');
+for i = 1:size(data, 2)
+    mu = mu_values(i);
+    [H, P, CI] = ttest(data(:,i), mu, 'Alpha', alpha);
+    fprintf('%s: H=%d, P=%.4f, CI=[%.4f, %.4f] MU=%.1f: ', labels(i), H, P, CI(1), CI(2), mu);
+    if H == 1
+        fprintf('Reject null hypothesis\n');
+    else
+        fprintf('Cannot reject null hypothesis\n');
+    end
+end
 
-% question b)
-[H, ~, CI] = ttest(waiting_1989, 75);
-fprintf("Confidence interval for mean of waiting time (1989): [%f, %f]\n", CI(1), CI(2));
-fprintf("Mean of waiting time (1989) is not 75\': %d\n\n", H);
+% Question (c)
+fprintf('\nQuestion (c)\n');
+for i = 1:size(data, 2)
+    [H, P] = chi2gof(data(:,i), 'Alpha', alpha);
+    fprintf('%s: H=%d, P=%.4f: ', labels(i), H, P);
+    if H == 1
+        fprintf('Reject null hypothesis\n');
+    else
+        fprintf('Cannot reject null hypothesis\n');
+    end
+end
 
-[H, ~, CI] = ttest(duration_1989, 2.5);
-fprintf("Confidence interval for mean of duration (1989): [%f, %f]\n", CI(1), CI(2));
-fprintf("Mean of duration (1989) is not 2.5\': %d\n\n", H);
+% Question (d)
+V = 10;
+expected_waiting_times = [65, 91];
+threshold = 2.5;
+labels = [sprintf("Waiting time after erruption lasting less than %.1f minutes", threshold), sprintf("Waiting time after erruption lasting more than %.1f minutes", threshold)];
 
-[H, ~, CI] = ttest(waiting_2006, 75);
-fprintf("Confidence interval for mean of waiting time (2006): [%f, %f]\n", CI(1), CI(2));
-fprintf("Mean of waiting time (2006) is not 75\': %d\n\n", H);
+fprintf('\nQuestion (d)\n');
+for i = 1:2
 
-% question c)
-[H, P] = chi2gof(waiting_1989);
-fprintf("goodness-of-fit test (waiting time 1989): %d, p-value: %f\n", H, P);
+    if i == 1
+        idx = find(data(:,2) < threshold);
+    else
+        idx = find(data(:,2) >= threshold);
+    end
+    waiting_data = data(idx,1);
+    [H, P, CI] = ttest(waiting_data, expected_waiting_times(i));
+    fprintf('%s:\n', labels(i));
+    fprintf('H=%d, P=%.4f, CI=[%.4f, %.4f] MU=%.1f: ', H, P, CI(1), CI(2), expected_waiting_times(i));
+    if H == 1
+        fprintf('Reject null hypothesis\n');
+    else
+        fprintf('Cannot reject null hypothesis\n');
+    end
 
-[H, P] = chi2gof(duration_1989);
-fprintf("goodness-of-fit test (duration time 1989): %d, p-value: %f\n", H, P);
+    [H, P, CI] = vartest(waiting_data, V^2);
+    fprintf('%s:\n', labels(i));
+    fprintf('H=%d, P=%.4f, CI=[%.4f, %.4f] VAR=%.1f: ', H, P, sqrt(CI(1)), sqrt(CI(2)), V);
+    if H == 1
+        fprintf('Reject null hypothesis\n');
+    else
+        fprintf('Cannot reject null hypothesis\n');
+    end
 
-[H, P] = chi2gof(waiting_2006);
-fprintf("goodness-of-fit test (waiting time 2006): %d, p-value: %f\n", H, P);
+    figure;
+    boxplot(waiting_data);
+    title(sprintf('%s (n=%d)', labels(i), length(waiting_data)));
 
-% Extra question
-[H, P, CI] = vartest(duration_1989, 10);
-fprintf("Error is not equal to 10 minutes: %d\n", H);
-
-% finds the indices of the elements that are less than 2.5
-indices_less_than_2_5 = duration_1989(1:end-1) < 2.5;
-
-% finds the indices of the elements where its previous element is less than 2.5
-indices_after_less_than_2_5 = [false, indices_less_than_2_5];
-
-% finds the indices of the elements where its previous element is greater than 2.5
-indices_after_more_than_2_5 = [false, ~indices_less_than_2_5];
-
-% split the data into two sets, one that contains the elements where its
-% previous is less thn 2.5 and one that its previous is greater than 2.5
-eruption_time_after_less_than_2_5 = duration_1989(indices_after_less_than_2_5);
-eruption_time_after_more_than_2_5 = duration_1989(indices_after_more_than_2_5);
-
-[H, ~, ~] = ttest(eruption_time_after_less_than_2_5, 65);
-fprintf("Old Faithful will not erupt 65 minutes after an eruption lasting less than 2.5 minutes: %d\n", H);
-[H, ~, ~] = ttest(eruption_time_after_more_than_2_5, 91);
-fprintf("Old Faithful will not erupt 91 minutes after an eruption lasting more than 2.5 minutes: %d\n", H);
+    figure;
+    histfit(waiting_data);
+    title(sprintf('%s (n=%d)', labels(i), length(waiting_data)));
+end
