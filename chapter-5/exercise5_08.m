@@ -1,6 +1,6 @@
 clc, clearvars, close all;
 
-varnames = {'Fore', 'Bicep', 'Chest', 'Neck', 'Shoulder', 'Waist', 'Height', 'Calf', 'Thigh', 'Head'};
+varnames = {'Mass', 'Fore', 'Bicep', 'Chest', 'Neck', 'Shoulder', 'Waist', 'Height', 'Calf', 'Thigh', 'Head'};
 physicalData = load('physical.txt');
 Y = physicalData(:,1);
 X = physicalData(:,2:size(physicalData, 2));
@@ -18,7 +18,7 @@ for i = 1:size(X, 2)
     R2 = STATS(1);  % alternatively: R2 = 1 - sse / sst;
     adjR2 = 1 - (n - 1) / (n - 2) * sse / sst;
     C = corrcoef(X(:,i), Y);
-    fprintf('%-10s%10.5f%10.5f%10.5f\n', varnames{i}, C(1, 2), R2, adjR2);
+    fprintf('%-10s%10.5f%10.5f%10.5f\n', varnames{i + 1}, C(1, 2), R2, adjR2);
 end
 
 X1 = [ones(size(X, 1), 1), X];
@@ -34,7 +34,7 @@ fprintf('\n========== Regression Model (all predictors) ==========\n');
 fprintf('%-10s%-10s%-10s%-20s\n', 'var-name', 'beta', 'estimate', sprintf('%d%% CI', (1 - alpha) * 100));
 fprintf('%-10s%-10s%10.5f%20s\n', 'const', 'b_0', B(1), sprintf('[%.5f,%.5f]', BINT(1, 1), BINT(1, 2)));
 for i = 2:length(B)
-    fprintf('%-10s%-10s%10.5f%20s\n', varnames{i - 1}, sprintf('b_%d', i - 1), B(i), sprintf('[%.5f,%.5f]', BINT(i, 1), BINT(i, 2)));
+    fprintf('%-10s%-10s%10.5f%20s\n', varnames{i}, sprintf('b_%d', i - 1), B(i), sprintf('[%.5f,%.5f]', BINT(i, 1), BINT(i, 2)));
 end
 fprintf('rmse = %.6f, R^2 = %.6f, adjR^2 = %.6f\n\n', rmse, R2, adjR2);
 
@@ -65,7 +65,7 @@ fprintf('%-10s%-10s%-10s%-20s\n', 'var-name', 'beta', 'estimate', sprintf('%d%% 
 fprintf('%-10s%-10s%10.5f%20s\n', 'const', 'b_0', b0, '--');
 for i = 1:length(B)
     if INMODEL(i) == 1
-        fprintf('%-10s%-10s%10.5f%20s\n', varnames{i}, sprintf('b_%d', i), B(i), sprintf('[%.5f,%.5f]', BINT(i, 1), BINT(i, 2)));
+        fprintf('%-10s%-10s%10.5f%20s\n', varnames{i + 1}, sprintf('b_%d', i), B(i), sprintf('[%.5f,%.5f]', BINT(i, 1), BINT(i, 2)));
     end
 end
 fprintf('rmse = %.6f, R^2 = %.6f, adjR^2 = %.6f\n\n', rmse, R2, adjR2);
