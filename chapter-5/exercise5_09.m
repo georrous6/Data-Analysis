@@ -101,3 +101,6 @@ for i = 1:size(X, 2)
     xvarnames = xvarnames(1:end - 1);
     fprintf('%-20s%-20s%10.5f%10.5f%10.5f\n', varnames{i + 1}, xvarnames, R2, adjR2, se);
 end
+
+figure;
+plotmatrix(X);
