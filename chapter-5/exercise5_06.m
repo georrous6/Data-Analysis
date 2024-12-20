@@ -21,7 +21,7 @@ for i = 1:length(transformX)
     
     [B, BINT, R, RINT, STATS] = regress(Yt, Xt, alpha);
     se = sqrt(STATS(4));
-    stdefit = R / se;
+    stdres = R / se;
     b0 = B(1);
     b1 = B(2);
     Yhat = b1 * Xt(:,2) + b0;
@@ -29,7 +29,7 @@ for i = 1:length(transformX)
     Sxx = C(1, 1) * (n - 1);
     mx = mean(Xt(:,2));
 
-    % R-squared and adjusted R-squared coefficients
+    % Calculate (adjusted) coefficient of multiple determination
     my = mean(Yt);
     R2 = 1 - sum(R.^2) / sum((Yt - my).^2);
     adjR2 = 1 - (n - 1) / (n - 2) * sum(R.^2) / sum((Yt - my).^2);
@@ -93,14 +93,14 @@ for i = 1:length(transformX)
     text(ax(1) + (ax(2) - ax(1)) * 0.1, ax(3) + 0.1 * (ax(4) - ax(3)), sprintf('adjR^2=%.3f', adjR2));
     
     figure;
-    scatter(Yhat, stdefit, 20, 'blue', 'filled');
+    scatter(Yhat, stdres, 20, 'blue', 'filled');
     hold on;
     plot(xlim, zcrit * [1, 1], '--r');
     plot(xlim, -zcrit * [1, 1], '--r');
     hold off;
-    title(sprintf('Diagnostic Variance Diagram (Model: %s)', models{i}));
+    title(sprintf('Diagnostic Plot (Model: %s)', models{i}));
     xlabel('Percentage Usable');
-    ylabel('Standard fit error');
+    ylabel('Standard Residual');
     fprintf('Press any key to continue...\n');
     pause;
     close all;
