@@ -1,6 +1,7 @@
+% Rousomanis Georgios (10703)
+% Daskalopoulos Aristeidis (10640)
+
 function Group19Exe5Fun2(X, y, description)
-    % Rousomanis Georgios (10703)
-    % Daskalopoulos Aristeidis (10640)
 
     if (size(X, 2) ~= 1 || size(y, 2) ~= 1)
         warning('X and y must be column vectors');
@@ -13,7 +14,7 @@ function Group19Exe5Fun2(X, y, description)
     lineWidth = 1.2;
     zcrit = norminv(1 - alpha / 2, 0, 1);
 
-    figure;
+    figure('Position', [100, 100, 800, 500]);
     title('Diagnostic plots of ED duration over Setup');
     for k = 1:max_deg
     

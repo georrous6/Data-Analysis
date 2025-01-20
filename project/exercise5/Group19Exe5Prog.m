@@ -2,8 +2,9 @@
 % Daskalopoulos Aristeidis (10640)
 
 clc, clearvars, close all;
+addpath('..');  % Add the parent directory to the path
 
-[data_with_TMS, data_without_TMS, varnames] = loadTMSdata('TMS.xlsx');
+[data_with_TMS, data_without_TMS, varnames] = loadTMSdata('../TMS.xlsx');
 
 % Regression model and diagnostic plot with and without TMS
 Group19Exe5Fun1(data_without_TMS(:,2), data_without_TMS(:,1), 'without TMS');

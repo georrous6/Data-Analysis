@@ -1,6 +1,7 @@
+% Rousomanis Georgios (10703)
+% Daskalopoulos Aristeidis (10640)
+
 function Group19Exe5Fun1(X, y, description)
-    % Rousomanis Georgios (10703)
-    % Daskalopoulos Aristeidis (10640)
 
     if (size(X, 2) ~= 1 || size(y, 2) ~= 1)
         warning('X and y must be column vectors');
@@ -12,7 +13,8 @@ function Group19Exe5Fun1(X, y, description)
     R2 = 1 - sum(res.^2) / sum((y - mean(y)).^2);
     
     % Regression model plot
-    figure;
+    figure('Position', [100, 100, 1000, 400]);
+    subplot(1, 2, 1);
     lineWidth = 1.2;
     hold on;
     scatter(X, y, '.');
@@ -25,7 +27,7 @@ function Group19Exe5Fun1(X, y, description)
     title(sprintf('Regression model for ED duration over Setup (%s)', description));
     
     % Diagnostic plot
-    figure;
+    subplot(1, 2, 2);
     hold on;
     alpha = 0.05;
     zcrit = norminv(1 - alpha / 2, 0, 1);

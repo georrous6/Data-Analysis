@@ -1,6 +1,7 @@
+% Rousomanis Georgios (10703)
+% Daskalopoulos Aristeidis (10640)
+
 function [data_with_TMS, data_without_TMS, varnames] = loadTMSdata(full_path)
-    % Rousomanis Georgios (10703)
-    % Daskalopoulos Aristeidis (10640)
 
     n_with_TMS = 119;
     
