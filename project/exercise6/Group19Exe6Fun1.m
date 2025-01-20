@@ -30,7 +30,7 @@ function [adjR2, MSE] = Group19Exe6Fun1(X, y, description)
     Group19Exe6Fun3(y, y_full, sprintf('Full Model (%s)', description), MSE_full);
     
     % Stepwise Regression
-    [b_step, ~, ~, inmodel, stats] = stepwisefit(X, y, 'display', 'off');
+    [b_step, ~, ~, inmodel, stats] = stepwisefit(X, y, 'display', 'on');
     b_step = [stats.intercept; b_step(inmodel)];  % Add intercept
     y_step = [ones(n, 1), X(:,inmodel)] * b_step;
     k = sum(inmodel);
@@ -47,16 +47,16 @@ function [adjR2, MSE] = Group19Exe6Fun1(X, y, description)
     
     % LASSO
     [b_lasso, fitinfo] = lasso(X, y);
-    % figure;
     % lassoPlot(b_lasso, fitinfo, 'PlotType', 'Lambda', 'XScale', 'log');
 
-    % Find the index of minimum lambda value where there is only one
-    % non-zero coefficient
-    lambda_index = find(sum(b_lasso ~= 0, 1) == 1, 1);
+    % Find the index of minimum lambda value where the number of non-zero
+    % coefficients is equal to the number of terms that the stepwise
+    % regression selected
+    lambda_index = find(sum(b_lasso ~= 0, 1) == sum(inmodel), 1);
     lambda = fitinfo.Lambda(lambda_index);
     fprintf('Lambda selected for LASSO (%s): %f\n', description, lambda);
     b_lasso = b_lasso(:,lambda_index);
-    y_lasso = X * b_lasso;
+    y_lasso = X * b_lasso + fitinfo.Intercept(lambda_index);
     SE_lasso = (y - y_lasso).^2;
     MSE_lasso = mean(SE_lasso);
     adjR2_lasso = 1 - (n - 1) / (n - (k + 1)) * sum(SE_lasso) / tss;
