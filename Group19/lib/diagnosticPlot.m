@@ -1,3 +1,6 @@
+% Rousomanis Georgios (10703)
+% Daskalopoulos Aristeidis (10640)
+
 function diagnosticPlot(y, y_pred, titleText, plotText)
     res = y - y_pred;
     res_std = res / std(res);
