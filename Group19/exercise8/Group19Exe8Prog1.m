@@ -2,7 +2,7 @@
 % Daskalopoulos Aristeidis (10640)
 
 clc, clearvars, close all;
-addpath('..');  % Add the parent directory to the path
+addpath('../lib/');  % Add the parent directory to the path
 
 data_with_TMS = loadTMSdata('../TMS.xlsx');
 
