@@ -1,3 +1,6 @@
+% Rousomanis Georgios (10703)
+% Daskalopoulos Aristeidis (10640)
+
 function observedVsPredictedPlot(y, y_pred, titleText, plotText)
     hold on;
     scatter(y, y_pred, '.');
