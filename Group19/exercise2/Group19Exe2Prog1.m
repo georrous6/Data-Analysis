@@ -4,11 +4,11 @@
 clc, clearvars, close all;
 addpath('../lib/');  % Add the lib directory to the path
 
-[data_with_TMS, data_without_TMS, varnames] = loadTMSdata('../TMS.xlsx');
+[data_with_TMS, data_without_TMS] = loadTMSdata('../TMS.xlsx');
 
 % Extract EDduration and CoilCode
-EDduration = data_with_TMS(:, 1);
-CoilCode = data_with_TMS(:, 9);
+EDduration = data_with_TMS{:, {'EDduration'}};
+CoilCode = data_with_TMS{:, {'CoilCode'}};
 
 % Define the two groups
 octagonal_data = EDduration(CoilCode == 1); % Octagonal(8) group
