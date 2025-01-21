@@ -4,11 +4,11 @@
 clc, clearvars, close all;
 addpath('../lib/');  % Add the lib directory to the path
 
-[data_with_TMS, data_without_TMS, varnames] = loadTMSdata('../TMS.xlsx');
+[data_with_TMS, data_without_TMS] = loadTMSdata('../TMS.xlsx');
 
 % Extract EDduration
-EDduration_with_TMS = data_with_TMS(:, 1);
-EDduration_without_TMS = data_without_TMS(:, 1);
+EDduration_with_TMS = data_with_TMS{:, {'EDduration'}};
+EDduration_without_TMS = data_without_TMS{:, {'EDduration'}};
 
 
 %% Find the appropriate known (parametric) pdf for EDduration with(out) TMS
