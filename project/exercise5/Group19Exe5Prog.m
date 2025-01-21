@@ -2,21 +2,21 @@
 % Daskalopoulos Aristeidis (10640)
 
 clc, clearvars, close all;
-addpath('..');  % Add the parent directory to the path
+addpath('../lib/');  % Add the parent directory to the path
 
-[data_with_TMS, data_without_TMS, varnames] = loadTMSdata('../TMS.xlsx');
+[data_with_TMS, data_without_TMS] = loadTMSdata('../TMS.xlsx');
 
 % Regression model and diagnostic plot with and without TMS
-Group19Exe5Fun1(data_without_TMS(:,2), data_without_TMS(:,1), 'without TMS');
-Group19Exe5Fun1(data_with_TMS(:,4), data_with_TMS(:,1), 'with TMS');
+Group19Exe5Fun1(data_without_TMS{:,{'Setup'}}, data_without_TMS{:,{'EDduration'}}, 'without TMS');
+Group19Exe5Fun1(data_with_TMS{:,{'Setup'}}, data_with_TMS{:,{'EDduration'}}, 'with TMS');
 
 % Diagnostic plots for higher order regression with and without TMS
-Group19Exe5Fun2(data_without_TMS(:,2), data_without_TMS(:,1), 'without TMS');
-Group19Exe5Fun2(data_with_TMS(:,4), data_with_TMS(:,1), 'with TMS');
+Group19Exe5Fun2(data_without_TMS{:,{'Setup'}}, data_without_TMS{:,{'EDduration'}}, 'without TMS');
+Group19Exe5Fun2(data_with_TMS{:,{'Setup'}}, data_with_TMS{:,{'EDduration'}}, 'with TMS');
 
 % Analysis Without TMS:
 %
-% - The coefficient of determination (R^2) is close to zero, indicating 
+% - The R-squared statistic is close to zero, indicating 
 %   that ED duration and Setup are not linearly correlated.
 %
 % - The diagnostic plot confirms that the model is unsuitable for 

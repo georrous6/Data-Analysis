@@ -2,15 +2,16 @@
 % Daskalopoulos Aristeidis (10640)
 
 clc, clearvars, close all;
-addpath('..');  % Add the parent directory to the path
+addpath('../lib/');  % Add the parent directory to the path
 
 data_with_TMS = loadTMSdata('../TMS.xlsx');
 
-X = data_with_TMS(:,end-5:end);
-y = data_with_TMS(:,2);
+X = data_with_TMS{:,{'Setup', 'Stimuli', 'Intensity', 'Spike', 'Frequency', 'CoilCode'}};
+y = data_with_TMS{:,{'EDduration'}};
 
 [adjR2_with_spike, MSE_with_spike] = Group19Exe6Fun1(X, y, 'with Spike');
-[adjR2_without_spike, MSE_without_spike] = Group19Exe6Fun1(X(:,[1, 2, 3, 5, 6]), y, 'without Spike');
+X = data_with_TMS{:,{'Setup', 'Stimuli', 'Intensity', 'Frequency', 'CoilCode'}};
+[adjR2_without_spike, MSE_without_spike] = Group19Exe6Fun1(X, y, 'without Spike');
 
 fprintf('\nWith Spike\n==================================\n');
 fprintf('\t\t  Full \t    Step \t LASSO\n');
@@ -27,58 +28,25 @@ disp(MSE_without_spike);
 
 % Analysis of Model Performance with and without the Spike Variable
 %
-% Performance Analysis (With Spike):
-% 
-% - The full regression model achieves the lowest Mean Squared Error (MSE), 
-%   followed by the stepwise regression model, and finally the LASSO model.
+% With Spike:
 %
-% - Despite its lower MSE, the full model has the smallest adjusted R-squared 
-%   (adjR^2) statistic. This is because adjR^2 penalizes models with greater 
-%   complexity, i.e., models using more predictors.
+% In this case, the LASSO model demonstrates the best performance in terms of both 
+% the adjusted R-squared statistic (adjR^2) and Mean Square Error (MSE). The full 
+% regression model exhibits the same MSE as the LASSO model. This occurs because the 
+% lambda parameter in the LASSO model is selected to minimize the MSE. Consequently, 
+% lambda becomes very small (nearly zero), making the LASSO model behave similarly to 
+% the Ordinary Least Squares (OLS) model. However, the LASSO model achieves a higher 
+% adjR^2 because the adjusted R-squared penalizes model complexity (i.e., models with 
+% a larger number of predictors).
 %
-% - Both the stepwise and LASSO models use the same number of independent 
-%   variables, but the stepwise model has a smaller MSE. Consequently, the 
-%   stepwise model’s adjR^2 is higher than that of the LASSO model.
+% Without Spike:
 %
-% - Summary: The full model is optimal for minimizing MSE, whereas the stepwise 
-%   model is optimal for maximizing adjR^2.
+% In this scenario, both the full model and the LASSO model achieve the best performance 
+% in terms of adjR^2 and MSE. The reason for their similar performance was explained in 
+% the previous section. Additionally, the performance of all models improves in terms of 
+% adjR^2 (higher adjR^2), while their performance declines in terms of MSE (higher MSE).
 %
-% Performance Analysis (Without Spike):
+% Overall:
 %
-% - As observed with the Spike variable, the full model achieves the lowest
-%   MSE but performs worse in terms of adjR^2 due to its higher complexity.
-%
-% - The stepwise model performs better than the LASSO model in both MSE 
-%   and adjR^2 scores.
-%
-% - Summary: Without the Spike variable, the full model remains the best 
-%   choice for minimizing MSE, while the stepwise model again offers the 
-%   best adjR^2.
-%
-% Comparison: With vs. Without Spike:
-%
-% - Full Model: 
-%   When the Spike variable is excluded, the full model experiences a 
-%   significant decrease in adjR^2 but achieves an improvement in MSE.
-% 
-% - Stepwise Model: 
-%   Similar to the full model, the stepwise regression shows lower adjR^2 but 
-%   better MSE when the Spike variable is removed.
-% 
-% - LASSO Model: 
-%   The LASSO model shows no change in adjR^2 but achieves a lower MSE without 
-%   the Spike variable.
-%
-% Key Takeaways:
-%
-% - Excluding the Spike variable results in improved MSE across all models.
-%
-% - The adjusted R-squared statistic generally decreases for the full and 
-%   stepwise models.
-%
-% - Interestingly, the LASSO model’s adjR^2 remains unaffected by the presence 
-%   or absence of the Spike variable.
-%
-% - This analysis highlights the trade-offs between minimizing MSE and 
-%   maximizing adjR^2, with the full model excelling in the former and the 
-%   stepwise model excelling in the latter.
+% The LASSO model consistently demonstrates the best predictive power in both cases, 
+% regardless of whether the Spike variable is included or excluded.

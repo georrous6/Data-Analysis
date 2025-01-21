@@ -1,7 +1,4 @@
-% Rousomanis Georgios (10703)
-% Daskalopoulos Aristeidis (10640)
-
-function Group19Exe6Fun3(y, y_pred, description, MSE)
+function diagnosticPlot(y, y_pred, titleText, plotText)
     res = y - y_pred;
     res_std = res / std(res);
     hold on;
@@ -11,9 +8,9 @@ function Group19Exe6Fun3(y, y_pred, description, MSE)
     plot(xlim, zcrit * [1, 1], '--r', 'LineWidth', 1.2);
     plot(xlim, -zcrit * [1, 1], '--r', 'LineWidth', 1.2);
     ax = axis;
-    text(ax(1) + 0.1 * (ax(2) - ax(1)), ax(3) + 0.9 * (ax(4) - ax(3)), sprintf('MSE=%.3f', MSE));
+    text(ax(1) + 0.1 * (ax(2) - ax(1)), ax(3) + 0.9 * (ax(4) - ax(3)), plotText);
     hold off;
     xlabel('y');
     ylabel('e^*');
-    title(sprintf('Diagnostic Plot: %s', description));
+    title(titleText);
 end

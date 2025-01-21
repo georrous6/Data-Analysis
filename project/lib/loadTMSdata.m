@@ -1,15 +1,14 @@
 % Rousomanis Georgios (10703)
 % Daskalopoulos Aristeidis (10640)
 
-function [data_with_TMS, data_without_TMS, varnames] = loadTMSdata(full_path)
+function [data_with_TMS, data_without_TMS] = loadTMSdata(full_path)
 
     n_with_TMS = 119;
     
     data = readtable(full_path);
-    varnames = data.Properties.VariableNames;
     
     % Identify problematic variables (columns with cell data)
-    for varName = varnames
+    for varName = data.Properties.VariableNames
         column = data.(varName{1}); % Access each column
         if iscell(column)
             % Convert cells to numeric (handles strings containing numbers)
@@ -25,6 +24,6 @@ function [data_with_TMS, data_without_TMS, varnames] = loadTMSdata(full_path)
         end
     end
     
-    data_with_TMS = table2array(data(1:n_with_TMS, 2:end));
-    data_without_TMS = table2array(data(n_with_TMS+1:end, [2, 5]));
+    data_with_TMS = data(1:n_with_TMS, :);
+    data_without_TMS = data(n_with_TMS+1:end, {'EDduration', 'Setup'});
 end
