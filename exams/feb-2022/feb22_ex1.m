@@ -1,6 +1,8 @@
 clc, clearvars, close all;
 addpath(genpath(fullfile('..', '..', 'lib')));
 
+%% (a)
+
 n = 20;
 X = randn(n, 1);
 B = 100;
@@ -15,11 +17,13 @@ p_value_skew = bootstrap_hypothesis_test(X, skewness_0, B, n, skew, alpha, 'Skew
 p_value_kurtosis = bootstrap_hypothesis_test(X, kurtosis_0, B, n, kurt, alpha, 'Kurtosis Empirical PDF (Under H_0)');
 
 fprintf('We %s the hypothesis that the skewness is equal to %.2f for %.2f significance level\n', ...
-    ternary(p_value_skew > alpha, 'cannot reject', 'reject'), skewness_0, alpha);
+    ternary(p_value_skew > alpha, 'CANNOT reject', 'reject'), skewness_0, alpha);
 fprintf('We %s the hypothesis that the kurtosis is equal to %.2f for %.2f significance level\n', ...
-    ternary(p_value_kurtosis > alpha, 'cannot reject', 'reject'), kurtosis_0, alpha);
+    ternary(p_value_kurtosis > alpha, 'CANNOT reject', 'reject'), kurtosis_0, alpha);
 fprintf('We %s the hypothesis that the data come from normal distribution for %.2f significance level\n', ...
-    ternary(p_value_skew > alpha, 'cannot reject', 'reject'), alpha);
+    ternary(p_value_skew > alpha, 'CANNOT reject', 'reject'), alpha);
+
+%% (b)
 
 B = 20;
 N = 10;
