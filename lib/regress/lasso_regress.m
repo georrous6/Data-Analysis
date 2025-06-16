@@ -4,8 +4,9 @@ function [b, y_pred, R2, adjR2] = lasso_regress(y, X, plt, lambda)
     else
         [b_all, stats] = lasso(X, y);
     end
-    idx_best = stats.IndexMinMSE;
+    [~, idx_best] = min(stats.MSE);
     b_best = b_all(:, idx_best);
+    df = stats.DF(idx_best);
     intercept = stats.Intercept(idx_best);
 
     n = size(X, 1);
@@ -13,10 +14,9 @@ function [b, y_pred, R2, adjR2] = lasso_regress(y, X, plt, lambda)
     y_pred = [ones(n, 1), X] * b;
 
     R2 = R_squared(y, y_pred);
-    adjR2 = adjR_squared(y, y_pred, sum(b_best ~= 0));
+    adjR2 = adjR_squared(y, y_pred, df);
 
-    if plt
-        figure;
+    if nargin > 2 && plt
         lassoPlot(b_all, stats);
     end
 end

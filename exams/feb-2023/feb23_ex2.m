@@ -3,62 +3,65 @@ addpath(genpath(fullfile('..', '..', 'lib')));
 
 % Load dataset
 data = load('Energy.dat');
-X = data(:,2:end);
-y = data(:,1);
+X_env = data(:,2:end);
+y_env = data(:,1);
 
-% Train/test split (50/50)
-N = size(data, 1);
-train_size = round(N / 2);
-X_train = X(1:train_size,:);
-y_train = y(1:train_size);
-X_test = X(train_size+1:end,:);
-y_test = y(train_size+1:end);
+[N, M] = size(data);
+p = 10;
+K = p * M;
+X = NaN(N - p, K);
+y = data(p+1:end,1);
+
+for i = 1:(N-p)
+    row = NaN(1, K);
+    for j = 1:p
+        idx = i + p - j;
+        row((j - 1) * M + 1 : j * M) = [y_env(idx), X_env(idx,:)];
+    end
+    X(i,:) = row;
+end
+
+n_train = 336;
+X_train = X(1:n_train,:);
+y_train = y(1:n_train);
+X_test = X(n_train+1:end,:);
+y_test = y(n_train+1:end,:);
+n_test = length(y_test);
 
 % Define models
-linear_model = @(X, y) regress(y, X);
-stepwise_model = @(X, y) stepwiselm(X, y);
-lasso_model = @(X, y) lasso(X, y, 'CV', 10);
-ridge_model = @(X, y, lambda) ridge(y, X, lambda, 0);
+linear_model = @(y, X) linear_regress(y, X);
+stepwise_model = @(y, X) stepwise_regress(y, X);
+lasso_model = @(y, X) lasso_regress(y, X, true);
+ridge_model = @(y, X) ridge_regress(y, X, 1:0.1:10, false);
+models = {linear_model, stepwise_model, lasso_model, ridge_model};
+modelNames = {'Linear', 'Stepwise', 'LASSO', 'Ridge'};
+n_models = length(models);
+y_pred_values = NaN(n_test, n_models);
+mse_values = NaN(1, n_models);
 
-% ----- Linear Regression -----
-b_linear = linear_model(X_train, y_train);
-y_pred_linear = X_test * b_linear;
-mse_linear = mean((y_test - y_pred_linear).^2);
+for i = 1:n_models
+    if i == 2  % Stepwise model 
+        [b, ~, ~, ~, inmodel] = models{i}(y_train, X_train);
+        X_in = X_test(:, inmodel);
+    else
+        b = models{i}(y_train, X_train);
+        X_in = X_test;
+    end
 
-% ----- Stepwise Regression -----
-mdl_stepwise = stepwise_model(X_train, y_train);
-y_pred_stepwise = predict(mdl_stepwise, X_test);
-mse_stepwise = mean((y_test - y_pred_stepwise).^2);
+    y_pred_values(:,i) = [ones(n_test, 1), X_in] * b;
+    mse_values(i) = mean((y_test - y_pred_values(:,i)).^2);
+end
 
-% ----- LASSO Regression -----
-[b_lasso, stats_lasso] = lasso_model(X_train, y_train);
-idx_best_lasso = stats_lasso.IndexMinMSE;
-b_lasso_best = b_lasso(:, idx_best_lasso);
-intercept_lasso = stats_lasso.Intercept(idx_best_lasso);
-y_pred_lasso = X_test * b_lasso_best + intercept_lasso;
-mse_lasso = mean((y_test - y_pred_lasso).^2);
+fprintf('MSE Results\n');
+fprintf('==============================\n');
+for i = 1:n_models
+    fprintf('%-20s: %.4f\n', sprintf('%s Regression', modelNames{i}), mse_values(i));
+end
 
-% ----- Ridge Regression -----
-lambda = 1;  % Regularization parameter (you can tune this)
-b_ridge = ridge_model(X_train, y_train, lambda);
-y_pred_ridge = X_test * b_ridge(2:end) + b_ridge(1);
-mse_ridge = mean((y_test - y_pred_ridge).^2);
-
-% ----- Display results -----
-fprintf('Mean Squared Errors:\n');
-fprintf('Linear Regression     : %.4f\n', mse_linear);
-fprintf('Stepwise Regression   : %.4f\n', mse_stepwise);
-fprintf('LASSO Regression      : %.4f\n', mse_lasso);
-fprintf('Ridge Regression (lambda=%.2f): %.4f\n', lambda, mse_ridge);
-
-% ----- Plot predictions -----
-figure('Position', [100, 100, 1000, 600]);
-plot(y_test, 'k', 'LineWidth', 1.5, 'DisplayName', 'True'); hold on;
-plot(y_pred_linear, '--b', 'LineWidth', 1.5, 'DisplayName', 'Linear');
-plot(y_pred_stepwise, '--g', 'LineWidth', 1.5, 'DisplayName', 'Stepwise');
-plot(y_pred_lasso, '--m', 'LineWidth', 1.5, 'DisplayName', 'LASSO');
-plot(y_pred_ridge, '--r', 'LineWidth', 1.5, 'DisplayName', 'Ridge');
-legend('Location', 'best');
+figure;
+window = 1:50;
+plot([y_test(window), y_pred_values(window,:)], 'LineStyle', '-', 'LineWidth', 1);
+legend(['True', modelNames]);
 xlabel('Sample Index');
 ylabel('Target Value');
 title('Model Predictions vs True Values');
