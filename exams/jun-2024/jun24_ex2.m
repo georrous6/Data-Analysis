@@ -1,5 +1,5 @@
 clc; clearvars; close all;
-addpath(genpath(fullfile('..', '..', 'lib')));  % If needed
+addpath(genpath(fullfile('..', '..', 'lib')));
 
 % === Load and preprocess data ===
 tableData = readtable('EmissionP10EU15.xlsx');
@@ -13,7 +13,7 @@ pcr_model = @(y, X) svd_regress(y, X, 0.95, 'PCR: Scree Plot and Explained Varia
 lasso_model = @(y, X) lasso_regress(y, X);
 ridge_model = @(y, X) ridge_regress(y, X, 1:1:10);
 stepwise_model = @(y, X) stepwise_regress(y, X);
-pls_model = @(y, X) pls_regress(y, X, 0.95, 'PLS: Scree Plot and Explained Variance');
+pls_model = @(y, X) pls_regress(y, X, 0.95, 'PLS: Explained Variance of Y');
 
 models = {pcr_model, lasso_model, ridge_model, stepwise_model, pls_model};
 modelNames = {'PC', 'LASSO', 'Ridge', 'Stepwise', 'PLS'};

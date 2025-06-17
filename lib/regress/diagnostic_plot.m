@@ -3,7 +3,7 @@ function diagnostic_plot(y, y_hat, x_values, n_params, xText, titleText)
     n = length(y);
     alpha = 0.05;
     zcrit = norminv(1 - alpha / 2);
-    se = sqrt(sum(y - y_hat).^2 / (n - n_params));
+    se = sqrt(sum((y - y_hat).^2) / (n - n_params));
     e = (y - y_hat) / se;
 
     figure; hold on;

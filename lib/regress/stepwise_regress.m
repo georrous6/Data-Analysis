@@ -1,6 +1,6 @@
 function [b, y_pred, R2, adjR2, inmodel] = stepwise_regress(y, X)
     
-    [b_all, ~, ~, inmodel, stats] = stepwisefit(X, y);
+    [b_all, ~, ~, inmodel, stats] = stepwisefit(X, y, 'display', 'off');
 
     n = size(X, 1);
     intercept = stats.intercept;

@@ -1,7 +1,7 @@
-function [b, y_pred, R2, adjR2] = pls_regress(y, X, explvar, titleText)
+function [b, y_pred, R2, adjR2] = pls_regress(y, X, explvarY, titleText)
 
     % Input validation
-    if explvar <= 0 || explvar > 1
+    if explvarY <= 0 || explvarY > 1
         error('Explained variance should be between (0, 1].');
     end
 
@@ -18,13 +18,13 @@ function [b, y_pred, R2, adjR2] = pls_regress(y, X, explvar, titleText)
 
     % Use a large max number of components first
     maxComponents = min(n - 1, p);
-    [~,~,~,~,~,pctVar] = plsregress(Xz, y_centered, maxComponents);
+    [~, ~, ~, ~, ~, pctVar] = plsregress(Xz, y_centered, maxComponents);
 
     % Cumulative variance explained in y
-    cumExplainedY = cumsum(pctVar(2, :)) / 100;
+    cumExplainedY = cumsum(pctVar(2, :));
 
     % Find number of components needed to reach desired explained variance
-    d = find(cumExplainedY >= explvar, 1);
+    d = find(cumExplainedY >= explvarY, 1);
     if isempty(d)
         d = maxComponents;
         warning('Explained variance threshold not reached. Using all components.');
@@ -42,11 +42,20 @@ function [b, y_pred, R2, adjR2] = pls_regress(y, X, explvar, titleText)
     y_pred = [ones(n, 1), X] * b;
 
     % R-square and adjusted R-square
-    R2 = 1 - sum((y - y_pred).^2) / sum((y - y_mean).^2);
-    adjR2 = 1 - ( (1 - R2) * (n - 1) / (n - d - 1) );
+    R2 = R_squared(y, y_pred);
+    adjR2 = adjR_squared(y, y_pred, d);
 
     % Optional scree plot of Y-variance explained
-    if nargin > 3 && ~isempty(titleText)
-        scree_plot(cumsum(PCTVAR(2, :)), explvar, titleText);
+    if nargin > 3
+        figure; hold on;
+        plot(100 * cumsum(PCTVAR(2, :)), '-bo', 'HandleVisibility', 'off');
+        ax = axis;
+        xlim = [ax(1), ax(2)];
+        plot(xlim, 100 * explvarY * [1, 1], '--r', 'DisplayName', sprintf('%d%% Variance threshold of Y', round(100 * explvarY)));
+        xlabel('Number of Components');
+        ylabel('Explained Variance of Y %');
+        title(titleText);
+        legend('Location', 'southeast');
+        grid on;
     end
 end

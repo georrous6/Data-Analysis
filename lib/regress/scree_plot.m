@@ -9,7 +9,7 @@ function scree_plot(lambda, explvar, titleText)
     plot(lambda, 'bo-', 'HandleVisibility', 'off');
     ax = axis;
     xlim = [ax(1), ax(2)];
-    plot(xlim, lambda(d) * [1, 1], 'r--', 'DisplayName', sprintf('explained variance >= %d%%', 100 * explvar));
+    plot(xlim, lambda(d) * [1, 1], 'r--', 'DisplayName', sprintf('explained variance >= %d%%', round(100 * explvar)));
     xlabel('Eigenvalue Index');
     ylabel('$\lambda_i$', 'Interpreter', 'latex');
     legend('Location', 'northeast');
@@ -19,9 +19,9 @@ function scree_plot(lambda, explvar, titleText)
     plot(100 * explained, 'bo-', 'HandleVisibility', 'off');
     ax = axis;
     xlim = [ax(1), ax(2)];
-    plot(xlim, 100 * explvar * [1, 1], 'r--', 'DisplayName', sprintf('explained variance %d%%', 100 * explvar));
+    plot(xlim, 100 * explvar * [1, 1], 'r--', 'DisplayName', sprintf('explained variance %d%%', round(100 * explvar)));
     xlabel('Number of Principal Components');
-    ylabel('Cumulative Explained Variance %%');
+    ylabel('Cumulative Explained Variance %');
     legend('Location', 'southeast');
     grid on;
 end
