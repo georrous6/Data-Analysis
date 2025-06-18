@@ -1,4 +1,24 @@
 function rejection_region_plot(theta_hat, cv, tail, titleText, test_stat)
+% rejection_region_plot - Visualizes bootstrap test statistic distribution with rejection regions
+%
+% Syntax:
+%   rejection_region_plot(theta_hat, cv, tail, titleText, test_stat)
+%
+% Inputs:
+%   theta_hat  - Vector of bootstrap test statistics
+%   cv         - Critical value(s) defining rejection region(s)
+%                (scalar for one-tailed test, two-element vector for two-tailed test)
+%   tail       - String specifying tail type: 'both', 'left', or 'right'
+%   titleText  - Title string for the plot
+%   test_stat  - (Optional) Observed test statistic to plot as a vertical line
+%
+% Description:
+%   This function plots the probability density histogram of bootstrap test statistics
+%   and shades the rejection region(s) in red based on the critical values and tail type.
+%   If test_stat is provided, it is shown as a green vertical line.
+%
+% Example:
+%   rejection_region_plot(boot_stats, [2.5, 97.5], 'both', 'Bootstrap Test', observed_stat);
 
     N = length(theta_hat);
     figure; hold on;

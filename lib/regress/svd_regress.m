@@ -1,4 +1,35 @@
 function [b, y_pred, R2, adjR2] = svd_regress(y, X, explvar, titleText)
+% svd_regress   Performs principal component regression using SVD
+%
+%   [b, y_pred, R2, adjR2] = svd_regress(y, X, explvar, titleText)
+%   fits a linear regression model using principal components obtained from
+%   singular value decomposition (SVD) of the standardized predictors.
+%
+%   Inputs:
+%       y         - Response vector (n-by-1)
+%       X         - Predictor matrix (n-by-p)
+%       explvar   - Desired explained variance threshold (scalar in (0,1])
+%       titleText - (Optional) Title for scree plot visualization
+%
+%   Outputs:
+%       b       - Regression coefficients vector [intercept; predictors]
+%       y_pred  - Predicted response vector from the model (n-by-1)
+%       R2      - R-squared value of the fitted model
+%       adjR2   - Adjusted R-squared of the fitted model
+%
+%   Description:
+%       - Standardizes predictors by centering and scaling to unit variance.
+%       - Performs SVD on standardized predictors to extract principal components.
+%       - Selects number of components d to meet or exceed explained variance explvar.
+%       - Computes regression coefficients based on truncated SVD components.
+%       - Transforms coefficients back to original scale.
+%       - Calculates predicted values and fit statistics.
+%       - Optionally plots scree plot of eigenvalues and explained variance.
+%
+%   Example:
+%       y = randn(100,1);
+%       X = randn(100,5);
+%       [b, y_pred, R2, adjR2] = svd_regress(y, X, 0.9, 'SVD Regression Scree Plot');
 
     % Input validation
     if explvar <= 0 || explvar > 1

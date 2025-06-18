@@ -1,4 +1,42 @@
 function [B, idx, y_pred, order, R2, adjR2] = stepwise_polynomial_regress(Y, X, k, alpha, verbose, plotScatter)
+% stepwise_polynomial_regress   Performs stepwise polynomial regression variable selection
+%
+%   [B, idx, y_pred, order, R2, adjR2] = stepwise_polynomial_regress(Y, X, k, alpha, verbose, plotScatter)
+%   fits polynomial regression models of degree k to each predictor in X sequentially,
+%   adding variables to the model if their contribution is statistically significant,
+%   based on a correlation test with significance level alpha.
+%
+%   Inputs:
+%       Y           - Response vector (n-by-1)
+%       X           - Predictor matrix (n-by-K)
+%       k           - Polynomial degree for each predictor
+%       alpha       - Significance level for variable inclusion (e.g., 0.05)
+%       verbose     - Boolean flag to print progress messages
+%       plotScatter - Boolean flag to plot scatter plots with fitted polynomials during selection
+%
+%   Outputs:
+%       B       - Coefficients matrix ((k+1)-by-K), each column for one predictor
+%       idx     - Binary vector (1-by-K), 1 if predictor included, 0 otherwise
+%       y_pred  - Predicted response vector from final model (n-by-1)
+%       order   - Order in which variables were added to the model
+%       R2      - R-squared of the final model
+%       adjR2   - Adjusted R-squared of the final model
+%
+%   Description:
+%       - Initializes residuals with Y and empty model.
+%       - At each step, fits polynomial regression (degree k) to each remaining variable.
+%       - Adds the variable with the highest R-squared if correlation test p-value < alpha.
+%       - Updates residuals and prediction after adding each variable.
+%       - Stops when no variables meet inclusion criteria.
+%
+%   Example:
+%       Y = randn(100,1);
+%       X = randn(100,5);
+%       k = 2;
+%       alpha = 0.05;
+%       verbose = true;
+%       plotScatter = false;
+%       [B, idx, y_pred, order, R2, adjR2] = stepwise_polynomial_regress(Y, X, k, alpha, verbose, plotScatter);
 
     [N, K] = size(X);
     B = NaN(k+1, K);
